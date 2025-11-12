@@ -1,0 +1,253 @@
+<!-- public/qr-print.html -->
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>端末QR印刷</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+    <style>
+      :root {
+        --page-w: 55mm;
+        --page-h: 80mm;
+        --page-margin: 1mm;
+
+        /* ★ QRのサイズ（15mmで安定稼働、白余白＋枠付き） */
+        --qr-size-mm: 15mm;
+        --font-pt: 9pt;
+      }
+
+      body {
+        margin: 0;
+        background: #fff;
+        font-family: system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', Arial;
+      }
+
+      .toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 14px;
+        border-bottom: 1px solid #e5e7eb;
+        background: #fafafa;
+      }
+      .controls {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .select,
+      .input,
+      .btn {
+        font-size: 12px;
+        padding: 6px 8px;
+      }
+      .btn {
+        cursor: pointer;
+      }
+      .note {
+        color: #666;
+        font-size: 12px;
+      }
+
+      /* ★ 1QR = 1ラベル */
+      .page {
+        width: var(--page-w);
+        height: var(--page-h);
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3mm;
+        box-sizing: border-box;
+        padding: calc(var(--page-margin) + 1mm);
+        background: #fff;
+      }
+
+      /* ★ QR外枠付き（カットガイド） */
+      .qr {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid #000; /* ← カットガイド枠線 */
+        background: #fff; /* ← 印刷時の白余白 */
+        padding: 1mm; /* ← QRと枠の間の白余白 */
+      }
+
+      .text {
+        text-align: center;
+        line-height: 1.4;
+        word-break: break-all;
+        font-size: var(--font-pt);
+        max-width: 90%;
+      }
+      .text .title {
+        font-weight: 700;
+      }
+      .text .device {
+        font-weight: 600;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      /* ★ 印刷設定 */
+      @media print {
+        .no-print {
+          display: none !important;
+        }
+        @page {
+          size: var(--page-w) var(--page-h);
+          margin: var(--page-margin);
+        }
+        .page {
+          page-break-after: always;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="toolbar no-print">
+      <div class="controls">
+        <strong>QRプレビュー</strong>
+        <select id="size" class="select">
+          <option value="portrait">55×80 mm（縦）</option>
+          <option value="landscape">80×55 mm（横）</option>
+        </select>
+        <input id="titleLine" class="input" placeholder="タイトル行（例：北王GROUP 端末）" />
+        <label class="input" style="display: flex; align-items: center; gap: 6px">
+          <input type="checkbox" id="showText" checked />
+          文字表示
+        </label>
+        <span class="note">※印刷時は縮尺100%</span>
+      </div>
+      <div class="controls">
+        <button id="printBtn" class="btn">印刷</button>
+        <button id="closeBtn" class="btn">閉じる</button>
+      </div>
+    </div>
+
+    <div id="root"></div>
+
+    <script>
+      function getQueryParam(name) {
+        const url = new URL(location.href);
+        return url.searchParams.get(name);
+      }
+
+      function mmToPx(mm) {
+        return Math.round((mm / 25.4) * 96);
+      }
+
+      function applyOrientation(mode) {
+        const root = document.documentElement;
+        if (mode === 'landscape') {
+          root.style.setProperty('--page-w', '80mm');
+          root.style.setProperty('--page-h', '55mm');
+        } else {
+          root.style.setProperty('--page-w', '55mm');
+          root.style.setProperty('--page-h', '80mm');
+        }
+      }
+
+      function renderPerPage(data, opts) {
+        const container = document.getElementById('root');
+        container.innerHTML = '';
+
+        const qrMM = parseFloat(
+          getComputedStyle(document.documentElement).getPropertyValue('--qr-size-mm')
+        );
+        const qrPX = mmToPx(qrMM);
+
+        data.forEach((d) => {
+          const page = document.createElement('div');
+          page.className = 'page';
+
+          const qrWrap = document.createElement('div');
+          qrWrap.className = 'qr';
+          const qrDiv = document.createElement('div');
+          qrWrap.appendChild(qrDiv);
+
+          new QRCode(qrDiv, {
+            text: d.deviceId || '',
+            width: qrPX,
+            height: qrPX,
+            correctLevel: QRCode.CorrectLevel.L, // 誤り訂正をLでコンパクト化
+          });
+
+          const text = document.createElement('div');
+          text.className = 'text';
+          if (!opts.showText) text.classList.add('hidden');
+
+          if (opts.titleLine) {
+            const t = document.createElement('div');
+            t.className = 'title';
+            t.textContent = opts.titleLine;
+            text.appendChild(t);
+          }
+
+          const device = document.createElement('div');
+          device.className = 'device';
+          device.textContent = 'ID: ' + (d.deviceId || '');
+          text.appendChild(device);
+
+          if (d.assetnumber) {
+            const an = document.createElement('div');
+            an.textContent = 'No: ' + d.assetnumber;
+            text.appendChild(an);
+          }
+
+          const desc = document.createElement('div');
+          const parts = [];
+          if (d.itemName) parts.push(d.itemName);
+          if (d.model) parts.push(d.model);
+          desc.textContent = parts.join(' / ');
+          text.appendChild(desc);
+
+          page.appendChild(qrWrap);
+          page.appendChild(text);
+          container.appendChild(page);
+        });
+      }
+
+      (function init() {
+        const key = getQueryParam('key');
+        let data = [];
+        try {
+          if (key) {
+            const raw = localStorage.getItem('qr:' + key);
+            if (raw) {
+              data = JSON.parse(raw) || [];
+              localStorage.removeItem('qr:' + key);
+            }
+          }
+        } catch {}
+
+        const sel = document.getElementById('size');
+        const title = document.getElementById('titleLine');
+        const showText = document.getElementById('showText');
+        const printBtn = document.getElementById('printBtn');
+        const closeBtn = document.getElementById('closeBtn');
+
+        applyOrientation(sel.value);
+        renderPerPage(data, { titleLine: title.value, showText: showText.checked });
+
+        sel.addEventListener('change', () => {
+          applyOrientation(sel.value);
+          renderPerPage(data, { titleLine: title.value, showText: showText.checked });
+        });
+        title.addEventListener('input', () => {
+          renderPerPage(data, { titleLine: title.value, showText: showText.checked });
+        });
+        showText.addEventListener('change', () => {
+          renderPerPage(data, { titleLine: title.value, showText: showText.checked });
+        });
+
+        printBtn.addEventListener('click', () => window.print());
+        closeBtn.addEventListener('click', () => window.close());
+      })();
+    </script>
+  </body>
+</html>

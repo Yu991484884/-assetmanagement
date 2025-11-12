@@ -1,275 +1,94 @@
-import { createRouter, createWebHistory } from "vue-router";
-import { useAuthStore } from "@/stores/auth";
-
+import { createRouter, createWebHistory } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
 
 const routes = [
   {
-    path: "/",
-    redirect: "/login", // デフォルトはログインページへリダイレクト
-    meta: { breadcrumb: [{ label: "ホーム", path: "/" }] },
+    path: '/',
+    redirect: '/login', // デフォルトはログインページへリダイレクト
+    meta: { breadcrumb: [{ label: 'ホーム', path: '/' }] },
   },
   {
-    path: "/login",
-    name: "Login",
-    component: () => import("../components/login/LoginView.vue"),
-    meta: { breadcrumb: [{ label: "ログイン", path: "/login" }] },
+    path: '/login',
+    name: 'Login',
+    component: () => import('../components/login/LoginView.vue'),
+    meta: { breadcrumb: [{ label: 'ログイン', path: '/login' }] },
   },
   {
-    path: "/ryukostatus",
-    name: "RyukoStatus",
-    component: () => import("../components/menu/ryukosubmenu/RyukoStatus.vue"),
+    path: '/companies',
+    name: 'CompanyMaster',
+    component: () => import('../components/menu/assetmanagement/CompanyMaster.vue'),
     meta: {
       breadcrumb: [
-        { label: "ホーム", path: "/" },
-        { label: "入庫進捗", path: "/ryukostatus" },
+        { label: 'ホーム', path: '/' },
+        { label: '資産会社', path: '/companies' },
       ],
     },
   },
   {
-    path: "/ryukoschedule",
-    name: "RyukoSchedule",
-    component: () => import("../components/menu/ryukosubmenu/RyukoSchedule.vue"),
+    path: '/itemcategories',
+    name: 'ItemCategories',
+    component: () => import('../components/menu/assetmanagement/ItemCategories.vue'),
     meta: {
       breadcrumb: [
-        { label: "ホーム", path: "/" },
-        { label: "入庫予定登録", path: "/ryukoschedule" },
+        { label: 'ホーム', path: '/' },
+        { label: 'カテゴリー', path: '/itemcategories' },
       ],
     },
   },
   {
-    path: "/ryukono",
-    name: "RyukoNo",
-    component: () => import("../components/menu/ryukosubmenu/RyukoNo.vue"),
-  },
-  {
-    path: "/ryukoseal",
-    name: "RyukoSeal",
-    component: () => import("../components/menu/ryukosubmenu/RyukoSeal.vue"),
-  },
-  {
-    path: "/ryukoconfirm",
-    name: "RyukoConfirm",
-    component: () => import("../components/menu/ryukosubmenu/RyukoConfirm.vue"),
+    path: '/loan_management',
+    name: 'LoanManagement',
+    component: () => import('../components/menu/assetmanagement/LoanManagement.vue'),
     meta: {
       breadcrumb: [
-        { label: "ホーム", path: "/" },
-        { label: "入庫確定", path: "/ryukoconfirm" },
+        { label: 'ホーム', path: '/' },
+        { label: '貸出履歴', path: '/loan_management' },
       ],
     },
   },
   {
-    path: "/ryukoachievements",
-    name: "RyukoAchievements",
-    component: () => import("../components/menu/ryukosubmenu/RyukoAchievements.vue"),
+    path: '/loan_state',
+    name: 'LoanStatus',
+    component: () => import('../components/menu/assetmanagement/LoanStatus.vue'),
     meta: {
       breadcrumb: [
-        { label: "ホーム", path: "/" },
-        { label: "入庫実績", path: "/ryukoachievements" },
+        { label: 'ホーム', path: '/' },
+        { label: '貸出状況', path: '/loan_state' },
       ],
     },
   },
   {
-    path: "/syukostatus",
-    name: "SyukoStatus",
-    component: () => import("../components/menu/syukosubmenu/SyukoStatus.vue"),
+    path: '/office_master',
+    name: 'OfficeMaster',
+    component: () => import('../components/menu/assetmanagement/OfficeMaster.vue'),
     meta: {
       breadcrumb: [
-        { label: "ホーム", path: "/" },
-        { label: "出庫進捗", path: "/syukostatus" },
+        { label: 'ホーム', path: '/' },
+        { label: '営業所', path: '/office_master' },
       ],
     },
   },
+
   {
-    path: "/syukoschedule",
-    name: "SyukoSchedule",
-    component: () => import("../components/menu/syukosubmenu/SyukoSchedule.vue"),
+    path: '/drvice_management',
+    name: 'DeviceManagement',
+    component: () => import('../components/menu/assetmanagement/DeviceManagement.vue'),
     meta: {
       breadcrumb: [
-        { label: "ホーム", path: "/" },
-        { label: "出庫予定", path: "/syukoschedule" },
+        { label: 'ホーム', path: '/' },
+        { label: '端末台帳', path: '/drvice_management' },
       ],
     },
   },
+
   {
-    path: "/syukohikiate",
-    name: "SyukoHikiate",
-    component: () => import("../components/menu/syukosubmenu/SyukoHikiate.vue"),
-  },
-  {
-    path: "/syukogurosu",
-    name: "SyukoGurosu",
-    component: () => import("../components/menu/syukosubmenu/SyukoGurosu.vue"),
+    path: '/qr_preview',
+    name: 'QrPreview',
+    component: () => import('../components/menu/assetmanagement/QrPreview.vue'),
     meta: {
       breadcrumb: [
-        { label: "ホーム", path: "/" },
-        { label: "グロス帳票印刷", path: "/syukogurosu" },
-      ],
-    },
-  },
-  {
-    path: "/syukoconfirm",
-    name: "SyukoConfirm",
-    component: () => import("../components/menu/syukosubmenu/SyukoConfirm.vue"),
-    meta: {
-      breadcrumb: [
-        { label: "ホーム", path: "/" },
-        { label: "出庫確定", path: "/syukoconfirm" },
-      ],
-    },
-  },
-  {
-    path: "/syukoachievements",
-    name: "SyukoAchievements",
-    component: () => import("../components/menu/syukosubmenu/SyukoAchievements.vue"),
-    meta: {
-      breadcrumb: [
-        { label: "ホーム", path: "/" },
-        { label: "出庫実績", path: "/syukoachievements" },
-      ],
-    },
-  },
-  {
-    path: "/itemmaster",
-    name: "ItemMaster",
-    component: () => import("../components/menu/mastersubmenu/ItemMaster.vue"),
-  },
-  {
-    path: "/customermaster",
-    name: "CustomerMaster",
-    component: () => import("../components/menu/mastersubmenu/CustomerMaster.vue"),
-  },
-  {
-    path: "/warehousemaster",
-    name: "WarehouseMaster",
-    component: () => import("../components/menu/mastersubmenu/WarehouseMaster.vue"),
-  },
-  {
-    path: "/tastemaster",
-    name: "TasteMaster",
-    component: () => import("../components/menu/mastersubmenu/TasteMaster.vue"),
-  },
-  {
-    path: "/shopmaster",
-    name: "ShopMaster",
-    component: () => import("../components/menu/mastersubmenu/ShopMaster.vue"),
-  },
-  {
-    path: "/productionmaster",
-    name: "ProductionMaster",
-    component: () => import("../components/menu/mastersubmenu/ProductionMaster.vue"),
-  },
-  {
-    path: "/coursemaster",
-    name: "CourseMaster",
-    component: () => import("../components/menu/mastersubmenu/CourseMaster.vue"),
-  },
-  {
-    path: "/location",
-    name: "LocationMove",
-    component: () => import("../components/menu/stocksubmenu/LocationMove.vue"),
-    meta: {
-      breadcrumb: [
-        { label: "ホーム", path: "/" },
-        { label: "在庫処理登録", path: "/location" },
-      ],
-    },
-  },
-    {
-    path: "/refill",
-    name: "RefillMove",
-    component: () => import("../components/menu/stocksubmenu/RefillMove.vue"),
-    meta: {
-      breadcrumb: [
-        { label: "ホーム", path: "/" },
-        { label: "補充帳票印刷", path: "/refill" },
-      ],
-    },
-  },
-      {
-    path: "/refilllist",
-    name: "RefillMoveList",
-    component: () => import("../components/menu/stocksubmenu/RefillMoveList.vue"),
-    meta: {
-      breadcrumb: [
-        { label: "ホーム", path: "/" },
-        { label: "補充登録実績", path: "/refilllist" },
-      ],
-    },
-  },
-      {
-    path: "/pdf-preview",
-    name: "PdfPreview",
-    component: () => import("../components/menu/stocksubmenu/PdfPreview.vue"),
-    meta: {
-      breadcrumb: [
-        { label: "ホーム", path: "/" },
-        { label: "商品リストプレビュー", path: "/pdf-preview" },
-      ],
-    },
-  },
-  {
-    path: "/locationprogress",
-    name: "LocationProgress",
-    component: () => import("../components/menu/stocksubmenu/LocationProgress.vue"),
-    meta: {
-      breadcrumb: [
-        { label: "ホーム", path: "/" },
-        { label: "在庫移動進捗", path: "/locationprogress" },
-      ],
-    },
-  },
-    {
-    path: "/moveconfirmed",
-    name: "MoveConfirmed",
-    component: () => import("../components/menu/stocksubmenu/MoveConfirmed.vue"),
-    meta: {
-      breadcrumb: [
-        { label: "ホーム", path: "/" },
-        { label: "通常入庫作成", path: "/moveconfirmed" },
-      ],
-    },
-  },
-      {
-    path: "/adjustment",
-    name: "AdjustmentDataCreation",
-    component: () => import("../components/menu/stocksubmenu/AdjustmentDataCreation.vue"),
-    meta: {
-      breadcrumb: [
-        { label: "ホーム", path: "/" },
-        { label: "調整データ作成", path: "/adjustment" },
-      ],
-    },
-  },
-  {
-    path: "/inventory",
-    name: "InventoryMainten",
-    component: () => import("../components/menu/stocksubmenu/InventoryMainten.vue"),
-        meta: {
-      breadcrumb: [
-        { label: "ホーム", path: "/" },
-        { label: "棚卸", path: "/inventory" },
-      ],
-    },
-  },
-    {
-    path: "/inventorystatus",
-    name: "InventoryMaintenStatus",
-    component: () => import("../components/menu/stocksubmenu/InventoryMaintenStatus.vue"),
-        meta: {
-      breadcrumb: [
-        { label: "ホーム", path: "/" },
-        { label: "棚卸進捗", path: "/inventorystatus" },
-      ],
-    },
-  },
-      {
-    path: "/inventorydata",
-    name: "InventoryMaintenData",
-    component: () => import("../components/menu/stocksubmenu/InventoryMaintenData.vue"),
-        meta: {
-      breadcrumb: [
-        { label: "ホーム", path: "/" },
-        { label: "棚卸実績作成", path: "/inventorydata" },
+        { label: 'ホーム', path: '/' },
+        { label: 'QR印刷プレビュー', path: '/qr_preview' },
       ],
     },
   },
@@ -286,15 +105,15 @@ router.beforeEach((to, from, next) => {
   const isAuthenticated = authStore.isAuthenticated;
 
   // ログインページへのアクセスは常に許可
-  if (to.path !== "/login" && !isAuthenticated) {
-    next("/login");
+  if (to.path !== '/login' && !isAuthenticated) {
+    next('/login');
   } else {
     next();
   }
 
   // ログインしていない場合はログインページへリダイレクト
   if (!authStore.isAuthenticated) {
-    next("/login");
+    next('/login');
   } else {
     next(); // ログイン済みの場合はそのまま進む
   }
